@@ -1,0 +1,1 @@
+print("conexion serial iniciada")
