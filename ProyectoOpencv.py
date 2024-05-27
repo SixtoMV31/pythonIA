@@ -2,9 +2,12 @@ import cv2
 import mediapipe
 import math
 import time
+import serial
+
+ser = serial.Serial('COM4', 9600, timeout=2)
 
 # Se configura el dispositivo que captura el video
-captura = cv2.VideoCapture(0)
+captura = cv2.VideoCapture(1)
 captura.set(3, 1280)  # Se define el ancho de la ventana
 captura.set(4, 720)  # Se define el alto de la ventana
 
@@ -53,7 +56,7 @@ while captura.isOpened:
                 landmark_drawing_spec=None,
                 connection_drawing_spec=mediapipeEstilos.get_default_face_mesh_tesselation_style(),
             )
-
+ 
             for id, puntos in enumerate(rostros.landmark):
                 al, an, c = video.shape
                 x, y = int(puntos.x * an), int(puntos.y * al)
@@ -93,14 +96,14 @@ while captura.isOpened:
 
                     cv2.putText(
                         video,
-                        f"Duración: {int(muestra)}",
+                        f"Duracion: {int(muestra)}",
                         (160, 100),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         1,
                         (0, 255, 0),
                         2,
                     )
-
+                    # es lo que muestra la longitud del ojo.//
                     # cv2.putText(
                     #     video,
                     #     f"longitud1: {int(longitud1)}",
@@ -126,16 +129,24 @@ while captura.isOpened:
                         parpadeo = True
                         inicio = time.time()
                     elif longitud1 > 15 and longitud2 > 15 and parpadeo == True:
+                        ser.write(b'b')
                         parpadeo = False
                         final = time.time()
-
+                       
+                        
+                    
                     tiempo = round(final - inicio, 0)
 
-                    if tiempo >= 3:
+                    if tiempo > 2:
+                            ser.write(b'a')
+
+                    
+                    if tiempo >= 2:
+                        #Aqui hiria la instruccion de enceder el arduino con la letra 'a'                        
                         conteo_sue += 1
                         muestra = tiempo
                         inicio = 0
-                        final = 0
+                        final = 0 
     if ret:
         cv2.imshow("Detección de sueño", video)
     if cv2.waitKey(1) & 0xFF == ord("q"):
