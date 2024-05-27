@@ -1,6 +1,6 @@
 import cv2
 
-captura=cv2.VideoCapture(1)
+captura=cv2.VideoCapture(0)
 while (captura.isOpened):
     ret, video=captura.read()
     if (ret):
@@ -10,3 +10,6 @@ while (captura.isOpened):
         break
 captura.release()
 cv2.destroyAllWindows()
+
+
+# 

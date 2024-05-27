@@ -15,12 +15,8 @@ while a == True:
     r = input("Deseas terminar?")
     if (r == "si"):
        ser.close()
-       a == False
        break
     elif (r != "si"):
        a == True
 
 print("El programa ha finalizado")
-
-
-
