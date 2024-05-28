@@ -4,10 +4,10 @@ import math
 import time
 import serial
 
-ser = serial.Serial('COM4', 9600, timeout=2)
+ser = serial.Serial('COM4', 9600, timeout=1)
 
 # Se configura el dispositivo que captura el video
-captura = cv2.VideoCapture(1)
+captura = cv2.VideoCapture(0)
 captura.set(3, 1280)  # Se define el ancho de la ventana
 captura.set(4, 720)  # Se define el alto de la ventana
 
@@ -15,7 +15,9 @@ captura.set(4, 720)  # Se define el alto de la ventana
 parpadeo = False
 conteo = 0
 tiempo = 0
+tiempo2 = 0
 inicio = 0
+inicio2 = 0
 final = 0
 conteo_sue = 0
 muestra = 0
@@ -66,7 +68,7 @@ while captura.isOpened:
                 if len(lista) == 468:
                     x1, y1 = lista[145][1:]
                     x2, y2 = lista[159][1:]
-                    cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
+                    cx, cy = (x1 + x2) // 2, (y1 + y2) // 2 
                     longitud1 = math.hypot(x2 - x1, y2 - y1)
 
                     x3, y3 = lista[145][1:]
@@ -127,28 +129,25 @@ while captura.isOpened:
                     if longitud1 <= 15 and longitud2 <= 15 and parpadeo == False:
                         conteo += 1
                         parpadeo = True
-                        inicio = time.time()
+                        inicio2 = time.perf_counter()
+                        inicio = time.time()  
+                    if longitud1 <= 15 and longitud2 <= 15 and parpadeo == False and inicio2 > 2:
+                        ser.write(b'a')  
+
                     elif longitud1 > 15 and longitud2 > 15 and parpadeo == True:
                         ser.write(b'b')
                         parpadeo = False
                         final = time.time()
-                       
-                        
-                    
+                   
+                                                                         
                     tiempo = round(final - inicio, 0)
-
-                    if tiempo > 2:
-                            ser.write(b'a')
-
-                    
-                    if tiempo >= 2:
-                        #Aqui hiria la instruccion de enceder el arduino con la letra 'a'                        
+                    if tiempo > 2:                  
                         conteo_sue += 1
                         muestra = tiempo
                         inicio = 0
                         final = 0 
     if ret:
-        cv2.imshow("Detección de sueño", video)
+        cv2.imshow("Deteccion de sueno", video)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 captura.release()
