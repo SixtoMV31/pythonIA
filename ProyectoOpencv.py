@@ -4,11 +4,12 @@ import math
 import time
 import serial
 
-ser = serial.Serial('COM4', 9600, timeout=1)
+arduino = serial.Serial('COM4', 9600)
 
 # Se configura el dispositivo que captura el video
 captura = cv2.VideoCapture(0)
 captura.set(3, 1280)  # Se define el ancho de la ventana
+
 captura.set(4, 720)  # Se define el alto de la ventana
 
 # Variables para conteo
@@ -35,8 +36,8 @@ mallaFacial = mediapipeMallaFacial.FaceMesh(
     min_tracking_confidence=0.5,
 )
 
-while captura.isOpened:
-
+while captura.isOpened():
+    # Lee los valores del tamaño y calidad de la pantalla
     ret, video = captura.read()
 
     cuadroRGB = cv2.cvtColor(video, cv2.COLOR_BGR2RGB)
@@ -71,8 +72,8 @@ while captura.isOpened:
                     cx, cy = (x1 + x2) // 2, (y1 + y2) // 2 
                     longitud1 = math.hypot(x2 - x1, y2 - y1)
 
-                    x3, y3 = lista[145][1:]
-                    x4, y4 = lista[159][1:]
+                    x3, y3 = lista[374][1:]
+                    x4, y4 = lista[386][1:]
                     cx2, cy2 = (x3 + x4) // 2, (y3 + y4) // 2
                     longitud2 = math.hypot(x4 - x3, y4 - y3)
 
@@ -81,14 +82,15 @@ while captura.isOpened:
                         f"Parpadeos: {int(conteo)}",
                         (20, 60),
                         cv2.FONT_HERSHEY_SIMPLEX,
-                        1,
+                       1,
                         (0, 255, 0),
-                        2,
+                       2,
                     )
 
                     cv2.putText(
                         video,
-                        f"Micro sueños: {int(conteo_sue)}",
+                        f"Micro suenos: {int(conteo_sue)}",
+                        #(20, 60),
                         (350, 60),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         1,
@@ -105,50 +107,34 @@ while captura.isOpened:
                         (0, 255, 0),
                         2,
                     )
-                    # es lo que muestra la longitud del ojo.//
-                    # cv2.putText(
-                    #     video,
-                    #     f"longitud1: {int(longitud1)}",
-                    #     (20, 180),
-                    #     cv2.FONT_HERSHEY_SIMPLEX,
-                    #     1,
-                    #     (0, 255, 0),
-                    #     2,
-                    # )
 
-                    # cv2.putText(
-                    #     video,
-                    #     f"longitud2: {int(longitud2)}",
-                    #     (350, 180),
-                    #     cv2.FONT_HERSHEY_SIMPLEX,
-                    #     1,
-                    #     (0, 255, 0),
-                    #     2,
-                    # )
+                    if longitud1 <= 15 and longitud2 <= 15:
+                       
+                        conteo +=1
 
-                    if longitud1 <= 15 and longitud2 <= 15 and parpadeo == False:
-                        conteo += 1
-                        parpadeo = True
-                        inicio2 = time.perf_counter()
-                        inicio = time.time()  
-                    if longitud1 <= 15 and longitud2 <= 15 and parpadeo == False and inicio2 > 2:
-                        ser.write(b'a')  
-
-                    elif longitud1 > 15 and longitud2 > 15 and parpadeo == True:
-                        ser.write(b'b')
+                        if not parpadeo:
+                            inicio = time.time()
+                            parpadeo = True
+                            
+                        else:
+                            tiempo_cerrado = time.time() - inicio
+                            if tiempo_cerrado > 2:
+                                conteo_sue += 1
+                                muestra = tiempo_cerrado
+                                # Aqui seria la activacion del arduino
+                                arduino.write(b'a')
+                                inicio = time.time()
+                    elif longitud1 > 15 and longitud2 > 15 and parpadeo==True:
+                        # Aqui seria el apagado del sonido del arduino
+                        arduino.write(b'b')
+                        conteo +=1
+                    else:
                         parpadeo = False
-                        final = time.time()
-                   
-                                                                         
-                    tiempo = round(final - inicio, 0)
-                    if tiempo > 2:                  
-                        conteo_sue += 1
-                        muestra = tiempo
-                        inicio = 0
-                        final = 0 
+
     if ret:
         cv2.imshow("Deteccion de sueno", video)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 captura.release()
 cv2.destroyAllWindows()
+arduino.close()  # Cerrar la comunicación con Arduino
