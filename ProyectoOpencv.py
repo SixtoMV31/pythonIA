@@ -152,4 +152,5 @@ while captura.isOpened:
         break
 captura.release()
 cv2.destroyAllWindows()
+
 arduino.close()  # Cerrar la comunicación con Arduino
