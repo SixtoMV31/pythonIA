@@ -8,7 +8,6 @@ void setup()
   pinMode(pinLED, OUTPUT);
   pinMode(pinSonido, OUTPUT);
 }
-
 void loop()
 {
     char option = Serial.read();
