@@ -1,33 +1,27 @@
-const int pinLed = 13;
+const int pinLED = 13;
 const int pinSonido = 4;
-const int frecuencia = 300;
+const int frecuencia = 500;
 
-char command = 'b';
-
-void setup()
+void setup() 
 {
-	pinMode(pinLed, OUTPUT);
+  Serial.begin(9600);
+  pinMode(pinLED, OUTPUT);
   pinMode(pinSonido, OUTPUT);
-	Serial.begin(9600);
 }
-
 void loop()
 {
-	if (Serial.available())
-	{
-		command = Serial.read();
-	}
-
-	if (command == 'a'){
-    digitalWrite(pinLed, HIGH);
-    tone(pinSonido, frecuencia);
-  }
-		
-	if (command == 'b'){
-    digitalWrite(pinLed, LOW);
-    digitalWrite(pinSonido, LOW);
-    noTone(pinSonido);
-
-  }
-		
+    char option = Serial.read();
+    if (option == 'a')
+      {
+        digitalWrite(pinLED, HIGH);
+        tone(pinSonido, frecuencia);
+        delay(200);
+      }
+    if (option == 'b')
+      {
+        digitalWrite(pinLED, LOW);
+        noTone(pinSonido);
+        delay(200);
+      }
+  
 }
