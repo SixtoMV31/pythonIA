@@ -4,9 +4,10 @@ import math
 import time
 import serial
 
+# Conexión con el esp32s en linux.
+arduino = serial.Serial('/dev/ttyUSB1', 115200) 
+
 # Se configura el dispositivo que captura el video
-arduino = serial.Serial('/dev/ttyACM0', 9600)
-#arduino = serial.Serial('COM8', 9600)
 captura = cv2.VideoCapture(0)
 #captura.set(3, 1280)  # Se define el ancho de la ventana
 #captura.set(4, 720)  # Se define el alto de la ventana
@@ -21,6 +22,7 @@ inicio = 0
 final = 0
 conteo_sue = 0
 muestra = 0
+ojos_cerrados = 0
 
 # Invocamos las funciones para los dibujos
 mediapipeDibujo = mediapipe.solutions.drawing_utils
@@ -130,27 +132,35 @@ while captura.isOpened:
                         conteo += 1
                         parpadeo = True
                         inicio = time.time()
+                        ojos_cerrados = time.time()
+                       
                     elif longitud1 > 15 and longitud2 > 15 and parpadeo == True:
                         parpadeo = False
                         final = time.time()
+                        print("apagar alarma")
                         arduino.write(b'b')
 
                     tiempo = round(final - inicio, 0)
 
-                    if tiempo >= 3:
+                    if tiempo >= 2:
                         conteo_sue += 1
                         muestra = tiempo
-                        arduino.write(b'a')
                         inicio = 0
                         final = 0
+
+                    #print(time.time() - ojos_cerrados)
+
+                    if time.time() - ojos_cerrados >= 2:
+                        ojos_cerrados = time.time()
+                        print("encender alarma")
+                        arduino.write(b'a')
+
+
     
     if (ret):
-       #cv2.imshow("Detección de sueño", video)
-       # video=cv2.flip(video,1)
-        cv2.imshow("Deteccion de sueño",video)
+        cv2.imshow("Roadsaver",video)
     if cv2.waitKey(1)& 0xFF==ord("q"):
         break
 captura.release()
 cv2.destroyAllWindows()
-
 arduino.close()  # Cerrar la comunicación con Arduino
