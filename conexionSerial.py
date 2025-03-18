@@ -1,10 +1,10 @@
 import serial
 
-ser = serial.Serial('COM4', 9600, timeout=2)
+ser = serial.Serial('COM9', 115200, timeout=2)
 
 a = True
 while a == True:
-    var = input("Escribe la letra 'a' para encender y la letra 'b' para apagar: ")
+    var = input("Escribe: ")
     if (var == "a"):
      
      ser.write(b'a')
