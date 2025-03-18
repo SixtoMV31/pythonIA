@@ -5,7 +5,9 @@ import time
 import serial
 
 # Conexión con el esp32s en linux.
-arduino = serial.Serial('/dev/ttyUSB1', 115200) 
+#arduino = serial.Serial('/dev/ttyUSB1', 115200)
+# Conexion para windows. 
+#arduino = serial.Serial('COM9', 115200) 
 
 # Se configura el dispositivo que captura el video
 captura = cv2.VideoCapture(0)
@@ -148,9 +150,9 @@ while captura.isOpened:
                         inicio = 0
                         final = 0
 
-                    #print(time.time() - ojos_cerrados)
+                    print(time.time() - ojos_cerrados)
 
-                    if time.time() - ojos_cerrados >= 2:
+                    if longitud1 <= 15 and longitud2 <= 15 and time.time() - ojos_cerrados >= 2:
                         ojos_cerrados = time.time()
                         print("encender alarma")
                         arduino.write(b'a')
