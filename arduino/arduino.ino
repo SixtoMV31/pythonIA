@@ -1,6 +1,6 @@
 const int pinLED = 13;
-const int pinSonido = 4;
-const int frecuencia = 500;
+const int pinSonido = 8;
+const int frecuencia = 300;
 
 void setup() 
 {
