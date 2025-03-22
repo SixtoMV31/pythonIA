@@ -2,7 +2,7 @@ import cv2
 import mediapipe
 import math
 import time
-import serial
+
 
 # Conexión con el esp32s en linux.
 #arduino = serial.Serial('/dev/ttyUSB1', 115200)
@@ -140,7 +140,6 @@ while captura.isOpened:
                         parpadeo = False
                         final = time.time()
                         print("apagar alarma")
-                        arduino.write(b'b')
 
                     tiempo = round(final - inicio, 0)
 
@@ -155,7 +154,6 @@ while captura.isOpened:
                     if longitud1 <= 15 and longitud2 <= 15 and time.time() - ojos_cerrados >= 2:
                         ojos_cerrados = time.time()
                         print("encender alarma")
-                        arduino.write(b'a')
 
 
     
@@ -165,4 +163,3 @@ while captura.isOpened:
         break
 captura.release()
 cv2.destroyAllWindows()
-arduino.close()  # Cerrar la comunicación con Arduino
